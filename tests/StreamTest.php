@@ -3,15 +3,13 @@ declare(strict_types=1);
 
 namespace Tests;
 
-use
-    Fyre\FileSystem\File,
-    Fyre\FileSystem\Folder,
-    Fyre\Stream\Stream,
-    Fyre\Stream\Exceptions\StreamException,
-    PHPUnit\Framework\TestCase;
+use Fyre\FileSystem\File;
+use Fyre\FileSystem\Folder;
+use Fyre\Stream\Stream;
+use Fyre\Stream\Exceptions\StreamException;
+use PHPUnit\Framework\TestCase;
 
-use const
-    SEEK_END;
+use const SEEK_END;
 
 final class StreamTest extends TestCase
 {

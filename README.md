@@ -1,6 +1,6 @@
 # FyreStream
 
-**FyreStream** is a free, stream library for *PHP*.
+**FyreStream** is a free, open-source stream library for *PHP*.
 
 
 ## Table Of Contents

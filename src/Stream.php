@@ -3,25 +3,22 @@ declare(strict_types=1);
 
 namespace Fyre\Stream;
 
-use
-    Fyre\Stream\Exceptions\StreamException;
+use Fyre\Stream\Exceptions\StreamException;
 
-use function
-    fclose,
-    feof,
-    fopen,
-    fread,
-    fseek,
-    fstat,
-    ftell,
-    fwrite,
-    is_resource,
-    preg_match,
-    stream_get_contents,
-    stream_get_meta_data;
+use const SEEK_SET;
 
-use const
-    SEEK_SET;
+use function fclose;
+use function feof;
+use function fopen;
+use function fread;
+use function fseek;
+use function fstat;
+use function ftell;
+use function fwrite;
+use function is_resource;
+use function preg_match;
+use function stream_get_contents;
+use function stream_get_meta_data;
 
 /**
  * Stream

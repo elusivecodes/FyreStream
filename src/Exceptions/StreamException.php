@@ -3,8 +3,7 @@ declare(strict_types=1);
 
 namespace Fyre\Stream\Exceptions;
 
-use
-    RuntimeException;
+use RuntimeException;
 
 /**
  * StreamException
