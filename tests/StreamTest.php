@@ -9,8 +9,6 @@ use Fyre\Stream\Stream;
 use Fyre\Stream\Exceptions\StreamException;
 use PHPUnit\Framework\TestCase;
 
-use const SEEK_END;
-
 final class StreamTest extends TestCase
 {
 
