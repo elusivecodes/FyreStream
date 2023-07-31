@@ -76,6 +76,7 @@ class Stream
 
     /**
      * Close the resource.
+     * @throws StreamException if the resource is not valid.
      */
     public function close(): void
     {
@@ -91,6 +92,7 @@ class Stream
     /**
      * Get the contents of the stream.
      * @return string The contents of the stream.
+     * @throws StreamException if the resource is not readable.
      */
     public function contents(): string
     {
