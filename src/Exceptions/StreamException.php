@@ -10,7 +10,6 @@ use RuntimeException;
  */
 class StreamException extends RuntimeException
 {
-
     public static function forInvalidResource(): static
     {
         return new static('Invalid stream resource');
@@ -30,5 +29,4 @@ class StreamException extends RuntimeException
     {
         return new static('Stream resource is not writable');
     }
-
 }

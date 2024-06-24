@@ -5,8 +5,6 @@ namespace Fyre\Stream;
 
 use Fyre\Stream\Exceptions\StreamException;
 
-use const SEEK_SET;
-
 use function fclose;
 use function feof;
 use function fopen;
@@ -20,28 +18,16 @@ use function preg_match;
 use function stream_get_contents;
 use function stream_get_meta_data;
 
+use const SEEK_SET;
+
 /**
  * Stream
  */
 class Stream
 {
-
-    protected $resource;
-
     protected array $metaData;
 
-    /**
-     * Create a Stream from a file path.
-     * @param string $filePath The file path.
-     * @param string $mode The file access mode.
-     * @return Stream The Stream.
-     */
-    public static function fromFile(string $filePath, string $mode = 'r'): self
-    {
-        $resource = fopen($filePath, $mode);
-
-        return new static($resource);
-    }
+    protected $resource;
 
     /**
      * New Stream constructor.
@@ -114,6 +100,19 @@ class Stream
         }
 
         return feof($this->resource);
+    }
+
+    /**
+     * Create a Stream from a file path.
+     * @param string $filePath The file path.
+     * @param string $mode The file access mode.
+     * @return Stream The Stream.
+     */
+    public static function fromFile(string $filePath, string $mode = 'r'): self
+    {
+        $resource = fopen($filePath, $mode);
+
+        return new static($resource);
     }
 
     /**
@@ -277,5 +276,4 @@ class Stream
     {
         return $this->metaData ??= stream_get_meta_data($this->resource);
     }
-
 }

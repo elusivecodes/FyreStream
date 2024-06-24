@@ -5,12 +5,26 @@ namespace Tests;
 
 use Fyre\FileSystem\File;
 use Fyre\FileSystem\Folder;
-use Fyre\Stream\Stream;
 use Fyre\Stream\Exceptions\StreamException;
+use Fyre\Stream\Stream;
 use PHPUnit\Framework\TestCase;
 
 final class StreamTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        (new File('tmp/test.txt', true))
+            ->open('w')
+            ->truncate()
+            ->write('This is a test.')
+            ->close();
+    }
+
+    protected function tearDown(): void
+    {
+        (new Folder('tmp'))
+            ->delete();
+    }
 
     public function testConstructorInvalid(): void
     {
@@ -79,9 +93,9 @@ final class StreamTest extends TestCase
         );
     }
 
-    public function testIsReadableNotReadable(): void
+    public function testIsReadableInvalid(): void
     {
-        $stream = Stream::fromFile('tmp/test.txt', 'w');
+        $stream = Stream::fromFile('tmp/test.txt');
 
         $stream->close();
 
@@ -90,9 +104,9 @@ final class StreamTest extends TestCase
         );
     }
 
-    public function testIsReadableInvalid(): void
+    public function testIsReadableNotReadable(): void
     {
-        $stream = Stream::fromFile('tmp/test.txt');
+        $stream = Stream::fromFile('tmp/test.txt', 'w');
 
         $stream->close();
 
@@ -130,20 +144,20 @@ final class StreamTest extends TestCase
         );
     }
 
-    public function testIsWritableNotWritable(): void
+    public function testIsWritableInvalid(): void
     {
         $stream = Stream::fromFile('tmp/test.txt');
+
+        $stream->close();
 
         $this->assertFalse(
             $stream->isWritable()
         );
     }
 
-    public function testIsWritableInvalid(): void
+    public function testIsWritableNotWritable(): void
     {
         $stream = Stream::fromFile('tmp/test.txt');
-
-        $stream->close();
 
         $this->assertFalse(
             $stream->isWritable()
@@ -160,15 +174,6 @@ final class StreamTest extends TestCase
         );
     }
 
-    public function testReadNotReadable(): void
-    {
-        $this->expectException(StreamException::class);
-
-        $stream = Stream::fromFile('tmp/test.txt', 'w');
-
-        $stream->read(16);
-    }
-
     public function testReadNotInvalid(): void
     {
         $this->expectException(StreamException::class);
@@ -176,6 +181,15 @@ final class StreamTest extends TestCase
         $stream = Stream::fromFile('tmp/test.txt');
 
         $stream->close();
+        $stream->read(16);
+    }
+
+    public function testReadNotReadable(): void
+    {
+        $this->expectException(StreamException::class);
+
+        $stream = Stream::fromFile('tmp/test.txt', 'w');
+
         $stream->read(16);
     }
 
@@ -281,15 +295,6 @@ final class StreamTest extends TestCase
         );
     }
 
-    public function testWriteNotWritable(): void
-    {
-        $this->expectException(StreamException::class);
-
-        $stream = Stream::fromFile('tmp/test.txt');
-
-        $stream->write('Test.');
-    }
-
     public function testWriteInvalid(): void
     {
         $this->expectException(StreamException::class);
@@ -300,19 +305,12 @@ final class StreamTest extends TestCase
         $stream->write('Test.');
     }
 
-    protected function setUp(): void
+    public function testWriteNotWritable(): void
     {
-        (new File('tmp/test.txt', true))
-            ->open('w')
-            ->truncate()
-            ->write('This is a test.')
-            ->close();
-    }
+        $this->expectException(StreamException::class);
 
-    protected function tearDown(): void
-    {
-        (new Folder('tmp'))
-            ->delete();
-    }
+        $stream = Stream::fromFile('tmp/test.txt');
 
+        $stream->write('Test.');
+    }
 }
