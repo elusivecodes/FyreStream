@@ -11,21 +11,6 @@ use PHPUnit\Framework\TestCase;
 
 final class StreamTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        (new File('tmp/test.txt', true))
-            ->open('w')
-            ->truncate()
-            ->write('This is a test.')
-            ->close();
-    }
-
-    protected function tearDown(): void
-    {
-        (new Folder('tmp'))
-            ->delete();
-    }
-
     public function testConstructorInvalid(): void
     {
         $this->expectException(StreamException::class);
@@ -312,5 +297,20 @@ final class StreamTest extends TestCase
         $stream = Stream::fromFile('tmp/test.txt');
 
         $stream->write('Test.');
+    }
+
+    protected function setUp(): void
+    {
+        (new File('tmp/test.txt', true))
+            ->open('w')
+            ->truncate()
+            ->write('This is a test.')
+            ->close();
+    }
+
+    protected function tearDown(): void
+    {
+        (new Folder('tmp'))
+            ->delete();
     }
 }

@@ -30,8 +30,24 @@ class Stream
     protected $resource;
 
     /**
+     * Create a Stream from a file path.
+     *
+     * @param string $filePath The file path.
+     * @param string $mode The file access mode.
+     * @return Stream The Stream.
+     */
+    public static function fromFile(string $filePath, string $mode = 'r'): self
+    {
+        $resource = fopen($filePath, $mode);
+
+        return new static($resource);
+    }
+
+    /**
      * New Stream constructor.
+     *
      * @param resource $resource The resource.
+     *
      * @throws StreamException if the resource is not valid.
      */
     public function __construct($resource)
@@ -45,6 +61,7 @@ class Stream
 
     /**
      * Get the entire contents of the stream.
+     *
      * @return string The entire contents of the stream.
      */
     public function __toString(): string
@@ -62,6 +79,7 @@ class Stream
 
     /**
      * Close the resource.
+     *
      * @throws StreamException if the resource is not valid.
      */
     public function close(): void
@@ -77,7 +95,9 @@ class Stream
 
     /**
      * Get the contents of the stream.
+     *
      * @return string The contents of the stream.
+     *
      * @throws StreamException if the resource is not readable.
      */
     public function contents(): string
@@ -91,6 +111,7 @@ class Stream
 
     /**
      * Determine if the stream has ended.
+     *
      * @return bool TRUE if the stream has ended, otherwise FALSE.
      */
     public function ended(): bool
@@ -103,20 +124,8 @@ class Stream
     }
 
     /**
-     * Create a Stream from a file path.
-     * @param string $filePath The file path.
-     * @param string $mode The file access mode.
-     * @return Stream The Stream.
-     */
-    public static function fromFile(string $filePath, string $mode = 'r'): self
-    {
-        $resource = fopen($filePath, $mode);
-
-        return new static($resource);
-    }
-
-    /**
      * Determine if the stream is readable.
+     *
      * @return bool TRUE if the stream is readable, otherwise FALSE.
      */
     public function isReadable(): bool
@@ -132,6 +141,7 @@ class Stream
 
     /**
      * Determine if the stream is seekable.
+     *
      * @return bool TRUE if the stream is seekable, otherwise FALSE.
      */
     public function isSeekable(): bool
@@ -147,6 +157,7 @@ class Stream
 
     /**
      * Determine if the stream is writable.
+     *
      * @return bool TRUE if the stream is writable, otherwise FALSE.
      */
     public function isWritable(): bool
@@ -162,8 +173,10 @@ class Stream
 
     /**
      * Read data from the stream.
+     *
      * @param int $length The number of bytes to read.
      * @return string The read data.
+     *
      * @throws StreamException if the resource is not readable.
      */
     public function read(int $length): string
@@ -183,6 +196,7 @@ class Stream
 
     /**
      * Rewind the stream.
+     *
      * @return Stream The Stream;
      */
     public function rewind(): static
@@ -192,9 +206,11 @@ class Stream
 
     /**
      * Move the pointer in the stream.
+     *
      * @param int $offset The offset.
      * @param int $whence The origin of the offset.
      * @return Stream The Stream.
+     *
      * @throws StreamException if the resource is not readable.
      */
     public function seek(int $offset, int $whence = SEEK_SET): static
@@ -214,6 +230,7 @@ class Stream
 
     /**
      * Get the size of the stream.
+     *
      * @param int|null The size of the stream.
      */
     public function size(): int|null
@@ -229,7 +246,9 @@ class Stream
 
     /**
      * Get the offset of the pointer.
+     *
      * @return int The offset of the pointer.
+     *
      * @throws StreamException if the resource is not valid.
      */
     public function tell(): int
@@ -249,8 +268,10 @@ class Stream
 
     /**
      * Write data to the stream.
+     *
      * @param string $data The data to write.
      * @return int The number of bytes written.
+     *
      * @throws StreamException if the resource is not writable.
      */
     public function write(string $data): int
@@ -270,6 +291,7 @@ class Stream
 
     /**
      * Get the stream meta data.
+     *
      * @return array The stream meta data.
      */
     protected function getMetaData(): array
