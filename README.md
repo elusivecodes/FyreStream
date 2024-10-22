@@ -6,7 +6,7 @@
 ## Table Of Contents
 - [Installation](#installation)
 - [Stream Creation](#stream-creation)
-- [Methods](#methods)
+- [Stream Methods](#stream-methods)
 
 
 
@@ -43,7 +43,7 @@ $stream = Stream::fromFile($filePath, $mode);
 ```
 
 
-## Methods
+## Stream Methods
 
 **Close**
 
@@ -63,7 +63,7 @@ $contents = $stream->contents();
 
 **Ended**
 
-Determine if the stream has ended.
+Determine whether the stream has ended.
 
 ```php
 $ended = $stream->ended();
@@ -71,7 +71,7 @@ $ended = $stream->ended();
 
 **Is Readable**
 
-Determine if the stream is readable.
+Determine whether the stream is readable.
 
 ```php
 $isReadable = $stream->isReadable();
@@ -79,7 +79,7 @@ $isReadable = $stream->isReadable();
 
 **Is Seekable**
 
-Determine if the stream is seekable.
+Determine whether the stream is seekable.
 
 ```php
 $isSeekable = $stream->isSeekable();
@@ -87,7 +87,7 @@ $isSeekable = $stream->isSeekable();
 
 **Is Writable**
 
-Determine if the stream is writable.
+Determine whether the stream is writable.
 
 ```php
 $isWritable = $stream->isWritable();

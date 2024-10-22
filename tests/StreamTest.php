@@ -3,11 +3,14 @@ declare(strict_types=1);
 
 namespace Tests;
 
-use Fyre\FileSystem\File;
-use Fyre\FileSystem\Folder;
 use Fyre\Stream\Exceptions\StreamException;
 use Fyre\Stream\Stream;
 use PHPUnit\Framework\TestCase;
+
+use function file_put_contents;
+use function mkdir;
+use function rmdir;
+use function unlink;
 
 final class StreamTest extends TestCase
 {
@@ -299,18 +302,23 @@ final class StreamTest extends TestCase
         $stream->write('Test.');
     }
 
+    public static function setUpBeforeClass(): void
+    {
+        mkdir('tmp');
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        rmdir('tmp');
+    }
+
     protected function setUp(): void
     {
-        (new File('tmp/test.txt', true))
-            ->open('w')
-            ->truncate()
-            ->write('This is a test.')
-            ->close();
+        file_put_contents('tmp/test.txt', 'This is a test.');
     }
 
     protected function tearDown(): void
     {
-        (new Folder('tmp'))
-            ->delete();
+        @unlink('tmp/test.txt');
     }
 }

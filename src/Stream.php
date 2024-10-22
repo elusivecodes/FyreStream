@@ -110,7 +110,7 @@ class Stream
     }
 
     /**
-     * Determine if the stream has ended.
+     * Determine whether the stream has ended.
      *
      * @return bool TRUE if the stream has ended, otherwise FALSE.
      */
@@ -124,7 +124,7 @@ class Stream
     }
 
     /**
-     * Determine if the stream is readable.
+     * Determine whether the stream is readable.
      *
      * @return bool TRUE if the stream is readable, otherwise FALSE.
      */
@@ -140,7 +140,7 @@ class Stream
     }
 
     /**
-     * Determine if the stream is seekable.
+     * Determine whether the stream is seekable.
      *
      * @return bool TRUE if the stream is seekable, otherwise FALSE.
      */
@@ -156,7 +156,7 @@ class Stream
     }
 
     /**
-     * Determine if the stream is writable.
+     * Determine whether the stream is writable.
      *
      * @return bool TRUE if the stream is writable, otherwise FALSE.
      */
