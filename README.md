@@ -5,8 +5,8 @@
 
 ## Table Of Contents
 - [Installation](#installation)
-- [Stream Creation](#stream-creation)
-- [Stream Methods](#stream-methods)
+- [Basic Usage](#basic-usage)
+- [Methods](#methods)
 
 
 
@@ -25,7 +25,7 @@ use Fyre\Stream\Stream;
 ```
 
 
-## Stream Creation
+## Basic Usage
 
 - `$resource` is a resource.
 
@@ -43,7 +43,7 @@ $stream = Stream::fromFile($filePath, $mode);
 ```
 
 
-## Stream Methods
+## Methods
 
 **Close**
 
