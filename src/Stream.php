@@ -27,8 +27,6 @@ class Stream
 {
     protected array $metaData;
 
-    protected $resource;
-
     /**
      * Create a Stream from a file path.
      *
@@ -50,13 +48,12 @@ class Stream
      *
      * @throws StreamException if the resource is not valid.
      */
-    public function __construct($resource)
-    {
+    public function __construct(
+        protected $resource
+    ) {
         if (!is_resource($resource)) {
             throw StreamException::forInvalidResource();
         }
-
-        $this->resource = $resource;
     }
 
     /**
