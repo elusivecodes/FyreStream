@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Fyre\Stream;
 
 use Fyre\Stream\Exceptions\StreamException;
+use Fyre\Utility\Traits\MacroTrait;
 
 use function fclose;
 use function feof;
@@ -25,6 +26,8 @@ use const SEEK_SET;
  */
 class Stream
 {
+    use MacroTrait;
+
     protected array $metaData;
 
     /**

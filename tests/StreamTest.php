@@ -5,8 +5,10 @@ namespace Tests;
 
 use Fyre\Stream\Exceptions\StreamException;
 use Fyre\Stream\Stream;
+use Fyre\Utility\Traits\MacroTrait;
 use PHPUnit\Framework\TestCase;
 
+use function class_uses;
 use function file_put_contents;
 use function mkdir;
 use function rmdir;
@@ -149,6 +151,14 @@ final class StreamTest extends TestCase
 
         $this->assertFalse(
             $stream->isWritable()
+        );
+    }
+
+    public function testMacroable(): void
+    {
+        $this->assertContains(
+            MacroTrait::class,
+            class_uses(Stream::class)
         );
     }
 
