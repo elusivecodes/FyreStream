@@ -5,6 +5,9 @@ namespace Fyre\Stream;
 
 use Fyre\Stream\Exceptions\StreamException;
 use Fyre\Utility\Traits\MacroTrait;
+use Fyre\Utility\Traits\StaticMacroTrait;
+use Psr\Http\Message\StreamInterface;
+use Stringable;
 
 use function fclose;
 use function feof;
@@ -14,6 +17,7 @@ use function fseek;
 use function fstat;
 use function ftell;
 use function fwrite;
+use function get_resource_type;
 use function is_resource;
 use function preg_match;
 use function stream_get_contents;
@@ -24,11 +28,10 @@ use const SEEK_SET;
 /**
  * Stream
  */
-class Stream
+class Stream implements StreamInterface, Stringable
 {
     use MacroTrait;
-
-    protected array $metaData;
+    use StaticMacroTrait;
 
     /**
      * Create a Stream from a file path.
@@ -37,9 +40,25 @@ class Stream
      * @param string $mode The file access mode.
      * @return Stream The Stream.
      */
-    public static function fromFile(string $filePath, string $mode = 'r'): self
+    public static function createFromFile(string $filePath, string $mode = 'r'): static
     {
         $resource = fopen($filePath, $mode);
+
+        return new static($resource);
+    }
+
+    /**
+     * Create a Stream from a string.
+     *
+     * @param string $content The string content.
+     * @return Stream The Stream.
+     */
+    public static function createFromString(string $content = ''): static
+    {
+        $resource = fopen('php://temp', 'r+');
+
+        fwrite($resource, $content);
+        rewind($resource);
 
         return new static($resource);
     }
@@ -54,7 +73,7 @@ class Stream
     public function __construct(
         protected $resource
     ) {
-        if (!is_resource($resource)) {
+        if (!is_resource($resource) || get_resource_type($resource) !== 'stream') {
             throw StreamException::forInvalidResource();
         }
     }
@@ -74,7 +93,7 @@ class Stream
             $this->rewind();
         }
 
-        return $this->contents();
+        return $this->getContents();
     }
 
     /**
@@ -88,9 +107,36 @@ class Stream
             throw StreamException::forInvalidResource();
         }
 
-        fclose($this->resource);
+        $resource = $this->detach();
+        fclose($resource);
+    }
+
+    /**
+     * Detach the resource from the stream.
+     *
+     * @return mixed The detached resource.
+     */
+    public function detach(): mixed
+    {
+        $resource = $this->resource;
 
         $this->resource = null;
+
+        return $resource;
+    }
+
+    /**
+     * Determine whether the stream has ended.
+     *
+     * @return bool TRUE if the stream has ended, otherwise FALSE.
+     */
+    public function eof(): bool
+    {
+        if (!$this->resource) {
+            return true;
+        }
+
+        return feof($this->resource);
     }
 
     /**
@@ -100,7 +146,7 @@ class Stream
      *
      * @throws StreamException if the resource is not readable.
      */
-    public function contents(): string
+    public function getContents(): string
     {
         if (!$this->isReadable()) {
             throw StreamException::forUnreadable();
@@ -110,17 +156,38 @@ class Stream
     }
 
     /**
-     * Determine whether the stream has ended.
+     * Get the stream meta data.
      *
-     * @return bool TRUE if the stream has ended, otherwise FALSE.
+     * @param string|null $key The meta data key.
+     * @return array The stream meta data.
      */
-    public function ended(): bool
+    public function getMetadata(string|null $key = null): mixed
     {
         if (!$this->resource) {
-            return true;
+            throw StreamException::forInvalidResource();
         }
 
-        return feof($this->resource);
+        $data = stream_get_meta_data($this->resource);
+
+        return $key ?
+            ($data[$key] ?? null) :
+            $data;
+    }
+
+    /**
+     * Get the size of the stream.
+     *
+     * @param int|null The size of the stream.
+     */
+    public function getSize(): int|null
+    {
+        if (!$this->resource) {
+            throw StreamException::forInvalidResource();
+        }
+
+        $stats = fstat($this->resource);
+
+        return $stats['size'] ?? null;
     }
 
     /**
@@ -134,9 +201,10 @@ class Stream
             return false;
         }
 
-        $meta = $this->getMetaData();
+        $meta = stream_get_meta_data($this->resource);
+        $mode = $meta['mode'];
 
-        return preg_match('/[r+]/', $meta['mode']) === 1;
+        return preg_match('/[r+]/', $mode) === 1;
     }
 
     /**
@@ -150,7 +218,7 @@ class Stream
             return false;
         }
 
-        $meta = $this->getMetaData();
+        $meta = stream_get_meta_data($this->resource);
 
         return $meta['seekable'];
     }
@@ -166,9 +234,10 @@ class Stream
             return false;
         }
 
-        $meta = $this->getMetaData();
+        $meta = stream_get_meta_data($this->resource);
+        $mode = $meta['mode'];
 
-        return preg_match('/[xwca+]/', $meta['mode']) === 1;
+        return preg_match('/[xwca+]/', $mode) === 1;
     }
 
     /**
@@ -196,12 +265,10 @@ class Stream
 
     /**
      * Rewind the stream.
-     *
-     * @return Stream The Stream;
      */
-    public function rewind(): static
+    public function rewind(): void
     {
-        return $this->seek(0);
+        $this->seek(0);
     }
 
     /**
@@ -209,11 +276,10 @@ class Stream
      *
      * @param int $offset The offset.
      * @param int $whence The origin of the offset.
-     * @return Stream The Stream.
      *
      * @throws StreamException if the resource is not readable.
      */
-    public function seek(int $offset, int $whence = SEEK_SET): static
+    public function seek(int $offset, int $whence = SEEK_SET): void
     {
         if (!$this->isSeekable()) {
             throw StreamException::forUnseekable();
@@ -224,24 +290,6 @@ class Stream
         if ($result !== 0) {
             throw StreamException::forUnseekable();
         }
-
-        return $this;
-    }
-
-    /**
-     * Get the size of the stream.
-     *
-     * @param int|null The size of the stream.
-     */
-    public function size(): int|null
-    {
-        if (!$this->resource) {
-            throw StreamException::forInvalidResource();
-        }
-
-        $stats = fstat($this->resource);
-
-        return $stats['size'] ?? null;
     }
 
     /**
@@ -287,15 +335,5 @@ class Stream
         }
 
         return $result;
-    }
-
-    /**
-     * Get the stream meta data.
-     *
-     * @return array The stream meta data.
-     */
-    protected function getMetaData(): array
-    {
-        return $this->metaData ??= stream_get_meta_data($this->resource);
     }
 }

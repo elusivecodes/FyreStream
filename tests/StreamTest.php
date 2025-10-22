@@ -6,8 +6,10 @@ namespace Tests;
 use Fyre\Stream\Exceptions\StreamException;
 use Fyre\Stream\Stream;
 use Fyre\Utility\Traits\MacroTrait;
+use Fyre\Utility\Traits\StaticMacroTrait;
 use PHPUnit\Framework\TestCase;
 
+use function array_diff;
 use function class_uses;
 use function file_put_contents;
 use function mkdir;
@@ -23,60 +25,116 @@ final class StreamTest extends TestCase
         new Stream(123);
     }
 
-    public function testContents(): void
+    public function testEof(): void
     {
-        $stream = Stream::fromFile('tmp/test.txt');
-
-        $this->assertSame(
-            'This is a test.',
-            $stream->contents()
-        );
-    }
-
-    public function testContentsInvalid(): void
-    {
-        $this->expectException(StreamException::class);
-
-        $stream = Stream::fromFile('tmp/test.txt');
-
-        $stream->close();
-        $stream->contents();
-    }
-
-    public function testEnded(): void
-    {
-        $stream = Stream::fromFile('tmp/test.txt');
+        $stream = Stream::createFromString('This is a test.');
 
         $this->assertFalse(
-            $stream->ended()
+            $stream->eof()
         );
     }
 
-    public function testEndedEnded(): void
+    public function testEofEnded(): void
     {
-        $stream = Stream::fromFile('tmp/test.txt');
+        $stream = Stream::createFromString('This is a test.');
 
         $stream->read(16);
 
         $this->assertTrue(
-            $stream->ended()
+            $stream->eof()
         );
     }
 
-    public function testEndedInvalid(): void
+    public function testEofInvalid(): void
     {
-        $stream = Stream::fromFile('tmp/test.txt');
+        $stream = Stream::createFromString('This is a test.');
 
         $stream->close();
 
         $this->assertTrue(
-            $stream->ended()
+            $stream->eof()
         );
+    }
+
+    public function testGetContents(): void
+    {
+        $stream = Stream::createFromString('This is a test.');
+
+        $this->assertSame(
+            'This is a test.',
+            $stream->getContents()
+        );
+    }
+
+    public function testGetContentsInvalid(): void
+    {
+        $this->expectException(StreamException::class);
+
+        $stream = Stream::createfromString('This is a test.');
+
+        $stream->close();
+        $stream->getContents();
+    }
+
+    public function testGetMetadata(): void
+    {
+        $stream = Stream::createFromString('This is a test.');
+
+        $this->assertSame(
+            [
+                'wrapper_type' => 'PHP',
+                'stream_type' => 'TEMP',
+                'mode' => 'w+b',
+                'unread_bytes' => 0,
+                'seekable' => true,
+                'uri' => 'php://temp',
+            ],
+            $stream->getMetadata()
+        );
+    }
+
+    public function testGetMetadataKey(): void
+    {
+        $stream = Stream::createFromString('This is a test.');
+
+        $this->assertSame(
+            'php://temp',
+            $stream->getMetadata('uri')
+        );
+    }
+
+    public function testGetMetadataKeyInvalid(): void
+    {
+        $stream = Stream::createFromString('This is a test.');
+
+        $this->assertNull(
+            $stream->getMetadata('invalid')
+        );
+    }
+
+    public function testGetSize(): void
+    {
+        $stream = Stream::createFromString('This is a test.');
+
+        $this->assertSame(
+            15,
+            $stream->getSize()
+        );
+    }
+
+    public function testGetSizeInvalid(): void
+    {
+        $this->expectException(StreamException::class);
+
+        $stream = Stream::createFromString('This is a test.');
+
+        $stream->close();
+        $stream->getSize();
     }
 
     public function testIsReadable(): void
     {
-        $stream = Stream::fromFile('tmp/test.txt');
+        $stream = Stream::createFromString('This is a test.');
 
         $this->assertTrue(
             $stream->isReadable()
@@ -85,7 +143,7 @@ final class StreamTest extends TestCase
 
     public function testIsReadableInvalid(): void
     {
-        $stream = Stream::fromFile('tmp/test.txt');
+        $stream = Stream::createFromString('This is a test.');
 
         $stream->close();
 
@@ -96,7 +154,7 @@ final class StreamTest extends TestCase
 
     public function testIsReadableNotReadable(): void
     {
-        $stream = Stream::fromFile('tmp/test.txt', 'w');
+        $stream = Stream::createFromFile('tmp/test.txt', 'w');
 
         $stream->close();
 
@@ -107,7 +165,7 @@ final class StreamTest extends TestCase
 
     public function testIsSeekable(): void
     {
-        $stream = Stream::fromFile('tmp/test.txt');
+        $stream = Stream::createFromString('This is a test.');
 
         $this->assertTrue(
             $stream->isSeekable()
@@ -116,7 +174,7 @@ final class StreamTest extends TestCase
 
     public function testIsSeekableInvalid(): void
     {
-        $stream = Stream::fromFile('tmp/test.txt');
+        $stream = Stream::createFromString('This is a test.');
 
         $stream->close();
 
@@ -127,7 +185,7 @@ final class StreamTest extends TestCase
 
     public function testIsWritable(): void
     {
-        $stream = Stream::fromFile('tmp/test.txt', 'w');
+        $stream = Stream::createFromFile('tmp/test.txt', 'w');
 
         $this->assertTrue(
             $stream->isWritable()
@@ -136,7 +194,7 @@ final class StreamTest extends TestCase
 
     public function testIsWritableInvalid(): void
     {
-        $stream = Stream::fromFile('tmp/test.txt');
+        $stream = Stream::createFromString('This is a test.');
 
         $stream->close();
 
@@ -147,7 +205,7 @@ final class StreamTest extends TestCase
 
     public function testIsWritableNotWritable(): void
     {
-        $stream = Stream::fromFile('tmp/test.txt');
+        $stream = Stream::createFromFile('tmp/test.txt');
 
         $this->assertFalse(
             $stream->isWritable()
@@ -156,15 +214,14 @@ final class StreamTest extends TestCase
 
     public function testMacroable(): void
     {
-        $this->assertContains(
-            MacroTrait::class,
-            class_uses(Stream::class)
+        $this->assertEmpty(
+            array_diff([MacroTrait::class, StaticMacroTrait::class], class_uses(Stream::class))
         );
     }
 
     public function testRead(): void
     {
-        $stream = Stream::fromFile('tmp/test.txt');
+        $stream = Stream::createFromString('This is a test.');
 
         $this->assertSame(
             'This is a test.',
@@ -176,7 +233,7 @@ final class StreamTest extends TestCase
     {
         $this->expectException(StreamException::class);
 
-        $stream = Stream::fromFile('tmp/test.txt');
+        $stream = Stream::createFromString('This is a test.');
 
         $stream->close();
         $stream->read(16);
@@ -186,14 +243,14 @@ final class StreamTest extends TestCase
     {
         $this->expectException(StreamException::class);
 
-        $stream = Stream::fromFile('tmp/test.txt', 'w');
+        $stream = Stream::createFromFile('tmp/test.txt', 'w');
 
         $stream->read(16);
     }
 
     public function testRewind(): void
     {
-        $stream = Stream::fromFile('tmp/test.txt');
+        $stream = Stream::createFromString('This is a test.');
 
         $stream->seek(5);
         $stream->rewind();
@@ -208,7 +265,7 @@ final class StreamTest extends TestCase
     {
         $this->expectException(StreamException::class);
 
-        $stream = Stream::fromFile('tmp/test.txt');
+        $stream = Stream::createFromString('This is a test.');
 
         $stream->close();
         $stream->rewind();
@@ -216,7 +273,7 @@ final class StreamTest extends TestCase
 
     public function testSeek(): void
     {
-        $stream = Stream::fromFile('tmp/test.txt');
+        $stream = Stream::createFromString('This is a test.');
 
         $stream->seek(5);
 
@@ -230,35 +287,15 @@ final class StreamTest extends TestCase
     {
         $this->expectException(StreamException::class);
 
-        $stream = Stream::fromFile('tmp/test.txt');
+        $stream = Stream::createFromString('This is a test.');
 
         $stream->close();
         $stream->seek(5);
     }
 
-    public function testSize(): void
-    {
-        $stream = Stream::fromFile('tmp/test.txt');
-
-        $this->assertSame(
-            15,
-            $stream->size()
-        );
-    }
-
-    public function testSizeInvalid(): void
-    {
-        $this->expectException(StreamException::class);
-
-        $stream = Stream::fromFile('tmp/test.txt');
-
-        $stream->close();
-        $stream->size();
-    }
-
     public function testTell(): void
     {
-        $stream = Stream::fromFile('tmp/test.txt');
+        $stream = Stream::createFromString('This is a test.');
 
         $this->assertSame(
             0,
@@ -270,7 +307,7 @@ final class StreamTest extends TestCase
     {
         $this->expectException(StreamException::class);
 
-        $stream = Stream::fromFile('tmp/test.txt');
+        $stream = Stream::createFromString('This is a test.');
 
         $stream->close();
         $stream->tell();
@@ -278,7 +315,7 @@ final class StreamTest extends TestCase
 
     public function testWrite(): void
     {
-        $stream = Stream::fromFile('tmp/test.txt', 'w+');
+        $stream = Stream::createFromFile('tmp/test.txt', 'w+');
 
         $this->assertSame(
             5,
@@ -297,7 +334,7 @@ final class StreamTest extends TestCase
     {
         $this->expectException(StreamException::class);
 
-        $stream = Stream::fromFile('tmp/test.txt', 'w');
+        $stream = Stream::createFromFile('tmp/test.txt', 'w');
 
         $stream->close();
         $stream->write('Test.');
@@ -307,7 +344,7 @@ final class StreamTest extends TestCase
     {
         $this->expectException(StreamException::class);
 
-        $stream = Stream::fromFile('tmp/test.txt');
+        $stream = Stream::createFromFile('tmp/test.txt');
 
         $stream->write('Test.');
     }

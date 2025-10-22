@@ -33,15 +33,22 @@ use Fyre\Stream\Stream;
 $stream = new Stream($resource);
 ```
 
-**From File**
+**Create From File**
 
 - `$filePath` is a string representing the file path.
 - `$mode` is a string representing the file access mode, and will default to "*r*".
 
 ```php
-$stream = Stream::fromFile($filePath, $mode);
+$stream = Stream::createFromFile($filePath, $mode);
 ```
 
+**Create From String**
+
+- `$string` is a string representing the stream content.
+
+```php
+$stream = Stream::createFromString($string);
+```
 
 ## Methods
 
@@ -53,20 +60,52 @@ Close the resource.
 $stream->close();
 ```
 
-**Contents**
+**Detach**
 
-Get the contents of the stream.
+Detach the resource from the stream.
 
 ```php
-$contents = $stream->contents();
+$stream->detach();
 ```
 
-**Ended**
+**Eof**
 
 Determine whether the stream has ended.
 
 ```php
-$ended = $stream->ended();
+$ended = $stream->eof();
+```
+
+**Get Contents**
+
+Get the contents of the stream.
+
+```php
+$contents = $stream->getContents();
+```
+
+**Get Metadata**
+
+Get the stream meta data.
+
+- `$key` is a string representing the meta data key.
+
+```php
+$value = $stream->getMetadata($key);
+```
+
+If the `$key` argument is omitted, this method will return an array containing all values.
+
+```php
+$data = $stream->getMetadata();
+```
+
+**Get Size**
+
+Get the size of the stream.
+
+```php
+$size = $stream->getSize();
 ```
 
 **Is Readable**
@@ -120,14 +159,6 @@ Move the pointer in the stream.
 
 ```php
 $stream->seek($offset, $whence);
-```
-
-**Size**
-
-Get the size of the stream.
-
-```php
-$size = $stream->size();
 ```
 
 **Tell**
