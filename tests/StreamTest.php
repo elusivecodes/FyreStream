@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Tests;
 
-use Fyre\Stream\Exceptions\StreamException;
-use Fyre\Stream\Stream;
+use Fyre\Http\Exceptions\StreamException;
+use Fyre\Http\Stream;
 use Fyre\Utility\Traits\MacroTrait;
 use Fyre\Utility\Traits\StaticMacroTrait;
 use PHPUnit\Framework\TestCase;

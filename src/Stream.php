@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace Fyre\Stream;
+namespace Fyre\Http;
 
-use Fyre\Stream\Exceptions\StreamException;
+use Fyre\Http\Exceptions\StreamException;
 use Fyre\Utility\Traits\MacroTrait;
 use Fyre\Utility\Traits\StaticMacroTrait;
 use Psr\Http\Message\StreamInterface;

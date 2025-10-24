@@ -21,7 +21,7 @@ composer require fyre/stream
 In PHP:
 
 ```php
-use Fyre\Stream\Stream;
+use Fyre\Http\Stream;
 ```
 
 
