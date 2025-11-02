@@ -6,6 +6,7 @@ namespace Fyre\Http;
 use Fyre\Http\Exceptions\StreamException;
 use Fyre\Utility\Traits\MacroTrait;
 use Fyre\Utility\Traits\StaticMacroTrait;
+use Override;
 use Psr\Http\Message\StreamInterface;
 use Stringable;
 
@@ -83,6 +84,7 @@ class Stream implements StreamInterface, Stringable
      *
      * @return string The entire contents of the stream.
      */
+    #[Override]
     public function __toString(): string
     {
         if (!$this->isReadable()) {
@@ -101,6 +103,7 @@ class Stream implements StreamInterface, Stringable
      *
      * @throws StreamException if the resource is not valid.
      */
+    #[Override]
     public function close(): void
     {
         if (!$this->resource) {
@@ -116,6 +119,7 @@ class Stream implements StreamInterface, Stringable
      *
      * @return mixed The detached resource.
      */
+    #[Override]
     public function detach(): mixed
     {
         $resource = $this->resource;
@@ -130,6 +134,7 @@ class Stream implements StreamInterface, Stringable
      *
      * @return bool TRUE if the stream has ended, otherwise FALSE.
      */
+    #[Override]
     public function eof(): bool
     {
         if (!$this->resource) {
@@ -146,6 +151,7 @@ class Stream implements StreamInterface, Stringable
      *
      * @throws StreamException if the resource is not readable.
      */
+    #[Override]
     public function getContents(): string
     {
         if (!$this->isReadable()) {
@@ -161,6 +167,7 @@ class Stream implements StreamInterface, Stringable
      * @param string|null $key The meta data key.
      * @return array The stream meta data.
      */
+    #[Override]
     public function getMetadata(string|null $key = null): mixed
     {
         if (!$this->resource) {
@@ -179,6 +186,7 @@ class Stream implements StreamInterface, Stringable
      *
      * @param int|null The size of the stream.
      */
+    #[Override]
     public function getSize(): int|null
     {
         if (!$this->resource) {
@@ -195,6 +203,7 @@ class Stream implements StreamInterface, Stringable
      *
      * @return bool TRUE if the stream is readable, otherwise FALSE.
      */
+    #[Override]
     public function isReadable(): bool
     {
         if (!$this->resource) {
@@ -212,6 +221,7 @@ class Stream implements StreamInterface, Stringable
      *
      * @return bool TRUE if the stream is seekable, otherwise FALSE.
      */
+    #[Override]
     public function isSeekable(): bool
     {
         if (!$this->resource) {
@@ -228,6 +238,7 @@ class Stream implements StreamInterface, Stringable
      *
      * @return bool TRUE if the stream is writable, otherwise FALSE.
      */
+    #[Override]
     public function isWritable(): bool
     {
         if (!$this->resource) {
@@ -248,6 +259,7 @@ class Stream implements StreamInterface, Stringable
      *
      * @throws StreamException if the resource is not readable.
      */
+    #[Override]
     public function read(int $length): string
     {
         if (!$this->isReadable()) {
@@ -266,6 +278,7 @@ class Stream implements StreamInterface, Stringable
     /**
      * Rewind the stream.
      */
+    #[Override]
     public function rewind(): void
     {
         $this->seek(0);
@@ -279,6 +292,7 @@ class Stream implements StreamInterface, Stringable
      *
      * @throws StreamException if the resource is not readable.
      */
+    #[Override]
     public function seek(int $offset, int $whence = SEEK_SET): void
     {
         if (!$this->isSeekable()) {
@@ -299,6 +313,7 @@ class Stream implements StreamInterface, Stringable
      *
      * @throws StreamException if the resource is not valid.
      */
+    #[Override]
     public function tell(): int
     {
         if (!$this->resource) {
@@ -322,6 +337,7 @@ class Stream implements StreamInterface, Stringable
      *
      * @throws StreamException if the resource is not writable.
      */
+    #[Override]
     public function write(string $data): int
     {
         if (!$this->isWritable()) {
